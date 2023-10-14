@@ -22,7 +22,7 @@ func NewAPI() *API {
 	}
 }
 
-func (d *API) GetVisiblePostsWithMedia(campaignID string) ([]PatreonEntity[Post], error) {
+func (d *API) GetVisiblePostsWithMedia(campaignID string) ([]Entity[Post], error) {
 	pq := &PostsQuery{
 		CampaignID: campaignID,
 		Sort:       "-published_at",
@@ -36,18 +36,18 @@ func (d *API) GetVisiblePostsWithMedia(campaignID string) ([]PatreonEntity[Post]
 	}
 
 	images := lo.KeyBy(
-		lo.Filter(body.Included, func(e PatreonEntity[Media], i int) bool {
+		lo.Filter(body.Included, func(e Entity[Media], i int) bool {
 			return e.Type == "media"
 		}),
-		func(e PatreonEntity[Media]) string {
+		func(e Entity[Media]) string {
 			return e.ID
 		},
 	)
 
-	posts := []PatreonEntity[Post]{}
+	posts := []Entity[Post]{}
 	for _, post := range body.Data {
 		if post.Attributes.CurrentUserCanView {
-			m := []PatreonEntity[Media]{}
+			m := []Entity[Media]{}
 			for _, imageID := range post.Attributes.PostMetadata.ImageOrder {
 				image := images[imageID]
 				if image.Attributes.DownloadURL == "" {

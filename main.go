@@ -16,17 +16,26 @@ func main() {
 	if err := lib.App.Apply(
 		di.Provide(patreon.NewAPI),
 		di.Provide(dl.NewAria2Downloader),
-		di.Provide(func() (*nutsdb.DB, error) {
-			return nutsdb.Open(
+		di.Provide(func() (*nutsdb.DB, func(), error) {
+			db, err := nutsdb.Open(
 				nutsdb.DefaultOptions,
 				nutsdb.WithDir(viper.GetString("db_path")),
 			)
+
+			cleanup := func() {
+				if err := db.Close(); err != nil {
+					log.Fatal(err)
+				}
+			}
+
+			return db, cleanup, err
 		}),
 	); err != nil {
 		log.Fatal(err)
 	}
 
 	cmd.Execute()
+	lib.App.Cleanup()
 }
 
 func init() {

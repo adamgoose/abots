@@ -15,18 +15,43 @@ var nutsdbCmd = &cobra.Command{
 }
 
 var nutsdbKeysCmd = &cobra.Command{
-	Use:   "keys {bucket}",
+	Use:   "keys {bucket} [prefix]",
 	Short: "List all keys in the given bucket",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(1, 2),
 	RunE: lib.RunE(func(args []string, db *nutsdb.DB) error {
 		return db.View(func(tx *nutsdb.Tx) error {
-			entries, err := tx.GetAll(args[0])
+			entries, err := tx.PrefixScan(args[0], []byte(args[1]), 0, 999)
 			if err != nil {
 				return err
 			}
 
 			for _, entry := range entries {
-				fmt.Println(string(entry.Key))
+				fmt.Printf("%s : %s\n", entry.Key, entry.Value)
+			}
+
+			return nil
+		})
+	}),
+}
+
+var nutsdbSetsCmd = &cobra.Command{
+	Use:   "sets {bucket}",
+	Short: "List all sets in the given bucket",
+	Args:  cobra.ExactArgs(1),
+	RunE: lib.RunE(func(args []string, db *nutsdb.DB) error {
+		return db.View(func(tx *nutsdb.Tx) error {
+			keys := []string{}
+			err := tx.SKeys(args[0], "*", func(key string) bool {
+				keys = append(keys, key)
+				// true: continue, false: break
+				return true
+			})
+			if err != nil {
+				return err
+			}
+
+			for _, key := range keys {
+				fmt.Println(key)
 			}
 
 			return nil
@@ -65,6 +90,7 @@ var nutsdbGetCmd = &cobra.Command{
 
 func init() {
 	nutsdbCmd.AddCommand(nutsdbKeysCmd)
+	nutsdbCmd.AddCommand(nutsdbSetsCmd)
 	nutsdbCmd.AddCommand(nutsdbSetCmd)
 	nutsdbCmd.AddCommand(nutsdbGetCmd)
 	rootCmd.AddCommand(nutsdbCmd)
