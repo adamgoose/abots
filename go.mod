@@ -3,6 +3,7 @@ module github.com/adamgoose/abots
 go 1.20
 
 require (
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/dghubble/sling v1.4.1
 	github.com/nutsdb/nutsdb v0.14.1
 	github.com/samber/lo v1.38.1

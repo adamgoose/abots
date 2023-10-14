@@ -1,22 +1,114 @@
 package patreon
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
 	"time"
 
-	"github.com/nutsdb/nutsdb"
+	"github.com/samber/lo"
 )
 
 type PatreonResponse[T any] struct {
-	Data     []Entity[T]     `json:"data"`
-	Included []Entity[Media] `json:"included"`
+	Data     []Entity[T]               `json:"data"`
+	Included []Entity[json.RawMessage] `json:"included"`
 }
 
 type Entity[T any] struct {
-	ID         string `json:"id"`
-	Type       string `json:"type"`
-	Attributes T
-	// Relationships map[string]interface{}
+	ID            string `json:"id"`
+	Type          string `json:"type"`
+	Attributes    T
+	Relationships Relationships `json:"relationships"`
+}
+
+type Relationships map[string]Relationship
+
+func (r Relationships) One(name string) (*RelationshipData, error) {
+	rel, ok := r[name]
+	if !ok {
+		return nil, errors.New("not found")
+	}
+
+	return rel.One()
+}
+
+func (r Relationships) Many(name string) ([]RelationshipData, error) {
+	rel, ok := r[name]
+	if !ok {
+		return nil, errors.New("not found")
+	}
+
+	return rel.Many()
+}
+
+type Relationship struct {
+	Data json.RawMessage `json:"data"`
+}
+
+func (r Relationship) One() (*RelationshipData, error) {
+	var d RelationshipData
+	if err := json.Unmarshal(r.Data, &d); err != nil {
+		return nil, err
+	}
+
+	return &d, nil
+}
+
+func (r Relationship) Many() ([]RelationshipData, error) {
+	var d []RelationshipData
+	if err := json.Unmarshal(r.Data, &d); err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
+type RelationshipData struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
+}
+
+func FindIncludeByType[T any](inc []Entity[json.RawMessage], t string) (*Entity[T], error) {
+	x, ok := lo.Find(inc, func(e Entity[json.RawMessage]) bool {
+		return e.Type == t
+	})
+	if !ok {
+		return nil, errors.New("not found")
+	}
+
+	return UnmarshalEntity[T](x)
+}
+
+func FindInclude[T any](inc []Entity[json.RawMessage], t, id string) (*Entity[T], error) {
+	x, ok := lo.Find(inc, func(e Entity[json.RawMessage]) bool {
+		return e.Type == t && e.ID == id
+	})
+	if !ok {
+		return nil, errors.New("not found")
+	}
+
+	return UnmarshalEntity[T](x)
+}
+
+func FindRelationship[T any](inc []Entity[json.RawMessage], rd RelationshipData) (*Entity[T], error) {
+	return FindInclude[T](inc, rd.Type, rd.ID)
+}
+
+func UnmarshalEntity[T any](e Entity[json.RawMessage]) (*Entity[T], error) {
+	ne := Entity[T]{
+		ID:   e.ID,
+		Type: e.Type,
+	}
+
+	if err := json.Unmarshal(e.Attributes, &ne.Attributes); err != nil {
+		return nil, err
+	}
+
+	return &ne, nil
+}
+
+type Campaign struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 type Post struct {
@@ -25,29 +117,6 @@ type Post struct {
 	TeaserText         string       `json:"teaser_text"`
 	PostMetadata       PostMetadata `json:"post_metadata"`
 	PublishedAt        time.Time    `json:"published_at"`
-
-	Media []Entity[Media] `json:"-"`
-}
-
-func (p Post) Persist(tx *nutsdb.Tx, bucket, postID, campaignID string) error {
-	if err := tx.SAdd(bucket,
-		[]byte(fmt.Sprintf("campaign:%s:posts", campaignID)),
-		[]byte(fmt.Sprintf("post:%s", postID)),
-	); err != nil {
-		return err
-	}
-
-	kvp := map[string]string{
-		fmt.Sprintf("post:%s:title", postID):       p.Title,
-		fmt.Sprintf("post:%s:teaser_text", postID): p.TeaserText,
-	}
-	for k, v := range kvp {
-		if err := tx.Put(bucket, []byte(k), []byte(v), 0); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 type PostMetadata struct {
@@ -64,28 +133,4 @@ type Media struct {
 	FileName    string `json:"file_name"`
 	MimeType    string `json:"mimetype"`
 	DownloadURL string `json:"download_url"`
-}
-
-func (m Media) Persist(tx *nutsdb.Tx, bucket, mediaID, postID string) error {
-	tid := fmt.Sprintf("media:%s", mediaID)
-
-	if err := tx.SAdd(bucket,
-		[]byte(fmt.Sprintf("post:%s:media", postID)),
-		[]byte(tid),
-	); err != nil {
-		return err
-	}
-
-	kvp := map[string]string{
-		fmt.Sprintf("%s:file_name", tid):    m.FileName,
-		fmt.Sprintf("%s:mimetype", tid):     m.MimeType,
-		fmt.Sprintf("%s:download_url", tid): m.DownloadURL,
-	}
-	for k, v := range kvp {
-		if err := tx.Put(bucket, []byte(k), []byte(v), 0); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
