@@ -60,7 +60,7 @@
       };
       flake = {
         overlays.default = final: prev: {
-          abots = pkgs.callPackage ./default.nix { };
+          abots = prev.callPackage ./default.nix { };
         };
       };
     };
