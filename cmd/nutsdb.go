@@ -40,12 +40,17 @@ var nutsdbKeysCmd = &cobra.Command{
 }
 
 var nutsdbSetsCmd = &cobra.Command{
-	Use:   "sets {bucket}",
+	Use:   "sets {bucket} {prefix=*}",
 	Short: "List all sets in the given bucket",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(1, 2),
 	RunE: lib.RunE(func(args []string, db *nutsdb.DB) error {
+		if len(args) == 1 {
+			args = append(args, "")
+		}
+		prefix := fmt.Sprintf("%s*", args[1])
+
 		return db.View(func(tx *nutsdb.Tx) error {
-			return tx.SKeys(args[0], "*", func(key string) bool {
+			return tx.SKeys(args[0], prefix, func(key string) bool {
 				fmt.Println(key)
 				return true
 			})

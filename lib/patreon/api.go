@@ -21,7 +21,7 @@ func NewAPI() *API {
 	}
 }
 
-func (d *API) GetPosts(campaignID string) (*PatreonResponse[Post], error) {
+func (d *API) GetPosts(campaignID string, cursor *string) (*PatreonResponse[Post], error) {
 	body := PatreonResponse[Post]{}
 
 	if _, err := d.New().
@@ -30,6 +30,7 @@ func (d *API) GetPosts(campaignID string) (*PatreonResponse[Post], error) {
 			CampaignID: campaignID,
 			Sort:       "-published_at",
 			Include:    "campaign,images",
+			Cursor:     cursor,
 		}).
 		ReceiveSuccess(&body); err != nil {
 		return nil, err

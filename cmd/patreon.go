@@ -24,6 +24,15 @@ var patreonScrapeCmd = &cobra.Command{
 	}),
 }
 
+var patreonDownloadCmd = &cobra.Command{
+	Use:   "download {campaign-id}",
+	Short: "Downloads the campaign's scraped media",
+	Args:  cobra.ExactArgs(1),
+	RunE: lib.RunE(func(args []string, d *patreon.Downloader) error {
+		return d.DownloadCampaign(args[0])
+	}),
+}
+
 var patreonCampaignCmd = &cobra.Command{
 	Use:   "campaign {campaign-id}",
 	Short: "Gets the given campaign",
@@ -71,6 +80,7 @@ var patreonCampaignCmd = &cobra.Command{
 
 func init() {
 	patreonCmd.AddCommand(patreonScrapeCmd)
+	patreonCmd.AddCommand(patreonDownloadCmd)
 	patreonCmd.AddCommand(patreonCampaignCmd)
 	rootCmd.AddCommand(patreonCmd)
 }

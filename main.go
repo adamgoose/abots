@@ -1,12 +1,13 @@
 package main
 
 import (
-	"log"
+	"os"
 
 	"github.com/adamgoose/abots/cmd"
 	"github.com/adamgoose/abots/lib"
 	"github.com/adamgoose/abots/lib/dl"
 	"github.com/adamgoose/abots/lib/patreon"
+	"github.com/charmbracelet/log"
 	"github.com/defval/di"
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/viper"
@@ -14,9 +15,17 @@ import (
 
 func main() {
 	if err := lib.App.Apply(
-		di.Provide(patreon.NewAPI),
-		di.Provide(dl.NewAria2Downloader),
-		di.Provide(func() (*nutsdb.DB, func(), error) {
+		// Configure Logging
+		di.Provide(func() *log.Logger {
+			l := log.New(os.Stdout)
+			l.SetLevel(log.ParseLevel(viper.GetString("log_level")))
+			l.SetTimeFormat("3:04.05pm")
+
+			return l
+		}),
+
+		// Configure Storage
+		di.Provide(func(l *log.Logger) (*nutsdb.DB, func(), error) {
 			db, err := nutsdb.Open(
 				nutsdb.DefaultOptions,
 				nutsdb.WithDir(viper.GetString("db_path")),
@@ -24,12 +33,16 @@ func main() {
 
 			cleanup := func() {
 				if err := db.Close(); err != nil {
-					log.Fatal(err)
+					l.Fatal(err)
 				}
 			}
 
 			return db, cleanup, err
 		}),
+
+		// Configure APIs
+		di.Provide(patreon.NewAPI),
+		di.Provide(dl.NewAria2Downloader),
 	); err != nil {
 		log.Fatal(err)
 	}

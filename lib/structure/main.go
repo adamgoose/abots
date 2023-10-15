@@ -3,8 +3,8 @@ package structure
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 
+	"github.com/charmbracelet/log"
 	"github.com/defval/di"
 	"github.com/nutsdb/nutsdb"
 )
@@ -14,25 +14,27 @@ type DB struct {
 	di.Inject
 
 	Nuts *nutsdb.DB
+	Log  *log.Logger
 }
 
 // View runs the given function in a nutsdb.Tx
 func (d *DB) View(fn func(tx *Tx) error) error {
 	return d.Nuts.View(func(tx *nutsdb.Tx) error {
-		return fn(&Tx{tx})
+		return fn(&Tx{tx, d.Log})
 	})
 }
 
 // Update runs the given function in a nutsdb.Tx
 func (d *DB) Update(fn func(tx *Tx) error) error {
 	return d.Nuts.Update(func(tx *nutsdb.Tx) error {
-		return fn(&Tx{tx})
+		return fn(&Tx{tx, d.Log})
 	})
 }
 
 // Tx wraps the nutsdb.Tx interface to add some helper methods
 type Tx struct {
 	*nutsdb.Tx
+	Log *log.Logger
 }
 
 // PutStruct encodes the given value as a gob and stores it in the given bucket
@@ -42,7 +44,7 @@ func (tx *Tx) PutStruct(bucket, key string, value any) error {
 		return err
 	}
 
-	fmt.Printf("Saving Struct %s\n", key)
+	tx.Log.Debug("Saving struct", "key", key, "bucket", bucket)
 
 	return tx.Put(bucket, []byte(key), enc.Bytes(), 0)
 }

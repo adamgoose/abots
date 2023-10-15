@@ -11,13 +11,23 @@ import (
 type PatreonResponse[T any] struct {
 	Data     []Entity[T]               `json:"data"`
 	Included []Entity[json.RawMessage] `json:"included"`
+	Meta     ResponseMeta              `json:"meta"`
 }
 
 type Entity[T any] struct {
-	ID            string `json:"id"`
-	Type          string `json:"type"`
-	Attributes    T
+	ID            string        `json:"id"`
+	Type          string        `json:"type"`
+	Attributes    T             `json:"attributes"`
 	Relationships Relationships `json:"relationships"`
+}
+
+type ResponseMeta struct {
+	Pagination struct {
+		Cursors struct {
+			Next string `json:"next"`
+		} `json:"cursors"`
+		Total int `json:"total"`
+	} `json:"pagination"`
 }
 
 type Relationships map[string]Relationship
@@ -124,9 +134,10 @@ type PostMetadata struct {
 }
 
 type PostsQuery struct {
-	CampaignID string `url:"filter[campaign_id],omitempty"`
-	Sort       string `url:"sort,omitempty"`
-	Include    string `url:"include,omitempty"`
+	CampaignID string  `url:"filter[campaign_id],omitempty"`
+	Sort       string  `url:"sort,omitempty"`
+	Include    string  `url:"include,omitempty"`
+	Cursor     *string `url:"page[cursor],omitempty"`
 }
 
 type Media struct {

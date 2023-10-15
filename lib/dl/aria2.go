@@ -1,6 +1,8 @@
 package dl
 
 import (
+	"fmt"
+
 	"github.com/siku2/arigo"
 	"github.com/spf13/viper"
 )
@@ -25,10 +27,10 @@ func NewAria2Downloader() (*Aria2Downloader, error) {
 	}, nil
 }
 
-func (a *Aria2Downloader) Download(url, filename string) error {
+func (a *Aria2Downloader) Download(url, dir, out string) error {
 	_, err := a.rpc.AddURI([]string{url}, &arigo.Options{
-		Out: filename,
-		Dir: a.root,
+		Out: out,
+		Dir: fmt.Sprintf("%s/%s", a.root, dir),
 	})
 	return err
 }
