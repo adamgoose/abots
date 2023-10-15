@@ -31,8 +31,8 @@
           ];
         };
 
-        packages.default = packages.tele2aria;
-        packages.tele2aria = pkgs.callPackage ./default.nix { };
+        packages.default = packages.abots;
+        packages.abots = pkgs.callPackage ./default.nix { };
         packages.container = pkgs.callPackage ./container.nix {
           pkgsLinux = import inputs.nixpkgs {
             system = "x86_64-linux";
