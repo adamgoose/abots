@@ -31,8 +31,8 @@
           ];
         };
 
-        packages.default = packages.abots;
         packages.abots = pkgs.callPackage ./default.nix { };
+        packages.default = packages.abots;
         packages.container = pkgs.callPackage ./container.nix {
           pkgsLinux = import inputs.nixpkgs {
             system = "x86_64-linux";
@@ -58,6 +58,10 @@
         };
 
       };
-      flake = { };
+      flake = {
+        overlays.default = final: prev: {
+          abots = prev.callPackage ./default.nix { };
+        };
+      };
     };
 }
