@@ -1,4 +1,5 @@
 builds:
   include:
     - 'packages.x86_64-linux.abots'
+    - 'packages.x86_64-linux.container'
     - 'packages.aarch64-darwin.abots'
