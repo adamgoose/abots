@@ -7,6 +7,7 @@ import (
 	"github.com/adamgoose/abots/lib"
 	"github.com/adamgoose/abots/lib/dl"
 	"github.com/adamgoose/abots/lib/patreon"
+	"github.com/adamgoose/abots/lib/stash"
 	"github.com/charmbracelet/log"
 	"github.com/defval/di"
 	"github.com/nutsdb/nutsdb"
@@ -43,6 +44,7 @@ func main() {
 		// Configure APIs
 		di.Provide(patreon.NewAPI),
 		di.Provide(dl.NewAria2Downloader),
+		di.Provide(stash.NewStash),
 	); err != nil {
 		log.Fatal(err)
 	}

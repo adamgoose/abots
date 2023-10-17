@@ -100,6 +100,9 @@ schema = 3
   [mod."github.com/samber/lo"]
     version = "v1.38.1"
     hash = "sha256-P0awJtu/YJIG+jrSrttBCIIf+JTn4y1VZvgJAR9nncY="
+  [mod."github.com/shurcooL/graphql"]
+    version = "v0.0.0-20230722043721-ed46e5a46466"
+    hash = "sha256-Pjd85apqsB21Mxz/29Rl6D9BKMRVYzrvXCeIqbAJmIk="
   [mod."github.com/siku2/arigo"]
     version = "v0.2.0"
     hash = "sha256-Ck0iP+9ADeW0u2dw3TdgNQQ3q+TUhyNAZjJnhJLlOwU="

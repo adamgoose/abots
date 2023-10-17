@@ -8,6 +8,7 @@ require (
 	github.com/dghubble/sling v1.4.1
 	github.com/nutsdb/nutsdb v0.14.1
 	github.com/samber/lo v1.38.1
+	github.com/shurcooL/graphql v0.0.0-20230722043721-ed46e5a46466
 	github.com/siku2/arigo v0.2.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
