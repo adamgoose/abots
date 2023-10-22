@@ -64,7 +64,8 @@
         };
 
         hydraJobs = {
-          inherit (self) packages;
+          abots = self.packages.x86_64-linux.abots;
+          container = self.packages.x86_64-linux.container;
         };
       };
     };
