@@ -62,6 +62,10 @@
         overlays.default = final: prev: {
           abots = prev.callPackage ./default.nix { };
         };
+
+        hydraJobs = {
+          inherit (self) packages;
+        };
       };
     };
 }
