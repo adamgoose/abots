@@ -16,7 +16,7 @@
     extra-substituters = "https://devenv.cachix.org https://cache.garnix.io";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.devenv.flakeModule
