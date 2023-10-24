@@ -10,6 +10,7 @@ import (
 	"github.com/adamgoose/abots/lib/stash"
 	"github.com/charmbracelet/log"
 	"github.com/defval/di"
+	"github.com/muesli/termenv"
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/viper"
 )
@@ -21,6 +22,9 @@ func main() {
 			l := log.New(os.Stdout)
 			l.SetLevel(log.ParseLevel(viper.GetString("log_level")))
 			l.SetTimeFormat("3:04.05pm")
+			if viper.GetBool("log_color") {
+				l.SetColorProfile(termenv.TrueColor)
+			}
 
 			return l
 		}),
@@ -42,6 +46,7 @@ func main() {
 		}),
 
 		// Configure APIs
+		di.Provide(patreon.NewAuthenticator),
 		di.Provide(patreon.NewAPI),
 		di.Provide(dl.NewAria2Downloader),
 		di.Provide(stash.NewStash),

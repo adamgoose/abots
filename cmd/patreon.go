@@ -6,13 +6,27 @@ import (
 	"github.com/adamgoose/abots/lib"
 	"github.com/adamgoose/abots/lib/patreon"
 	"github.com/adamgoose/abots/lib/structure"
-	"github.com/davecgh/go-spew/spew"
+	"github.com/k0kubun/pp"
 	"github.com/spf13/cobra"
 )
 
 var patreonCmd = &cobra.Command{
 	Use:   "patreon",
 	Short: "Interact with the Patreon API",
+}
+
+var patreonUserCmd = &cobra.Command{
+	Use:   "user",
+	Short: "Gets the current user",
+	RunE: lib.RunE(func(a *patreon.API) error {
+		user, err := a.GetUser()
+		if err != nil {
+			return err
+		}
+
+		pp.Println(user.Data)
+		return nil
+	}),
 }
 
 var patreonScrapeCmd = &cobra.Command{
@@ -47,7 +61,7 @@ var patreonCampaignCmd = &cobra.Command{
 				return err
 			}
 
-			spew.Dump(ss)
+			pp.Println(ss)
 
 			mm, err := tx.SMembers(bucket, []byte(fmt.Sprintf("%s:posts", cid)))
 			if err != nil {
@@ -79,6 +93,7 @@ var patreonCampaignCmd = &cobra.Command{
 }
 
 func init() {
+	patreonCmd.AddCommand(patreonUserCmd)
 	patreonCmd.AddCommand(patreonScrapeCmd)
 	patreonCmd.AddCommand(patreonDownloadCmd)
 	patreonCmd.AddCommand(patreonCampaignCmd)

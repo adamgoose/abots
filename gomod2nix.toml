@@ -25,9 +25,6 @@ schema = 3
   [mod."github.com/charmbracelet/log"]
     version = "v0.2.5"
     hash = "sha256-h2DkVx/fgmuXPgX4UTjglUmvqwQVhe7q4nJRu90NdO8="
-  [mod."github.com/davecgh/go-spew"]
-    version = "v1.1.2-0.20180830191138-d8f796af33cc"
-    hash = "sha256-fV9oI51xjHdOmEx6+dlq7Ku2Ag+m/bmbzPo6A4Y74qc="
   [mod."github.com/defval/di"]
     version = "v1.12.0"
     hash = "sha256-Fo2lfgKr+ZwjGbiIkFM28XDmz2mJIRHvV2ktG/1txSQ="
@@ -58,12 +55,21 @@ schema = 3
   [mod."github.com/inconshreveable/mousetrap"]
     version = "v1.1.0"
     hash = "sha256-XWlYH0c8IcxAwQTnIi6WYqq44nOKUylSWxWO/vi+8pE="
+  [mod."github.com/k0kubun/colorstring"]
+    version = "v0.0.0-20150214042306-9440f1994b88"
+    hash = "sha256-cmGwhftooSUXKypIpMV3nvcrmMusIJjtT5P4eZSfWkc="
+  [mod."github.com/k0kubun/pp"]
+    version = "v3.0.1+incompatible"
+    hash = "sha256-P6A3RrpSnHTDbpodwtCG6veJvtl10Uw2/Nj4XR7gZJU="
   [mod."github.com/lucasb-eyer/go-colorful"]
     version = "v1.2.0"
     hash = "sha256-Gg9dDJFCTaHrKHRR1SrJgZ8fWieJkybljybkI9x0gyE="
   [mod."github.com/magiconair/properties"]
     version = "v1.8.7"
     hash = "sha256-XQ2bnc2s7/IH3WxEO4GishZurMyKwEclZy1DXg+2xXc="
+  [mod."github.com/mattn/go-colorable"]
+    version = "v0.1.13"
+    hash = "sha256-qb3Qbo0CELGRIzvw7NVM1g/aayaz4Tguppk9MD2/OI8="
   [mod."github.com/mattn/go-isatty"]
     version = "v0.0.18"
     hash = "sha256-QpIn0DSggtBn2ocyj0RlXDKLK5F5KZG1/ogzrqBCjF8="

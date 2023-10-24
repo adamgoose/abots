@@ -14,6 +14,12 @@ type PatreonResponse[T any] struct {
 	Meta     ResponseMeta              `json:"meta"`
 }
 
+type PatreonResponseOne[T any] struct {
+	Data     Entity[T]                 `json:"data"`
+	Included []Entity[json.RawMessage] `json:"included"`
+	Meta     ResponseMeta              `json:"meta"`
+}
+
 type Entity[T any] struct {
 	ID            string        `json:"id"`
 	Type          string        `json:"type"`
@@ -114,6 +120,16 @@ func UnmarshalEntity[T any](e Entity[json.RawMessage]) (*Entity[T], error) {
 	}
 
 	return &ne, nil
+}
+
+type User struct {
+	Name  string `json:"full_name"`
+	Email string `json:"email"`
+}
+
+type CurrentUserQuery struct {
+	Include    string `url:"include,omitempty"`
+	UserFields string `url:"fields[user],omitempty"`
 }
 
 type Campaign struct {
