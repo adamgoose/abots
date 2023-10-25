@@ -55,6 +55,15 @@
             nix build --builders "$NIX_BUILDERS" .#container
             podman load < result
           '';
+
+          pre-commit.hooks = {
+            gomod2nix = {
+              enable = true;
+              entry = "${pkgs.gomod2nix}/bin/gomod2nix";
+              files = "go.mod|go.sum";
+              pass_filenames = false;
+            };
+          };
         };
 
       };

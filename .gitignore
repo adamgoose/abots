@@ -4,3 +4,4 @@
 .direnv
 result
 scratch.go
+.pre-commit-config.yaml
